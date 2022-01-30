@@ -1,3 +1,5 @@
+// Copyright (c) 2022, Adam Koch. All rights reserved.
+
 import tap from 'tap'
 import parseArguments from '../src/parse_arguments.js'
 

@@ -1,5 +1,13 @@
 #! /usr/local/bin/node
 
+// Copyright (c) 2022, Adam Koch. All rights reserved.
+
+// This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 /**
  * Use in conjunction with "login" and "logout" aliases:
  *   login='echo $(gdate -Iminutes) login >> ~/timesheet.txt'
@@ -39,10 +47,6 @@ function createInterval(previousEvent, currentEvent, currentIntervalMinutes) {
     new Duration(currentIntervalMinutes)
   return interval
 }
-
-// function removeRepeats(groupedByDates) {
-//   return groupedByDates
-// }
 
 function toDateString(date) {
   return date.getFullYear() + '-' + ('' + (date.getMonth() + 1)).padStart(2, '0') + '-' + ('' + date.getDate()).padStart(2, '0')
@@ -183,14 +187,3 @@ export {
   toTimeString,
   removeRepeats
 }
-
-// .map((d1, idx, arr) => {
-//   if (idx < arr.length - 1) {
-//     const retArr = []
-//     if (d1[0].getDate() != arr[idx+1][0].getDate()) {
-//       retArr.push('='.repeat(20))
-//     }
-//     retArr.push([d1[0].toLocaleDateString(), 'from', d1[0].toLocaleTimeString(), 'to', arr[idx+1][0].toLocaleTimeString(), 'was', (arr[idx+1][0] - d1[0])/60000, 'minutes'].join(' '))
-//     return retArr
-//   }
-// }).join('\n'))
