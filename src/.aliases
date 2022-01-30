@@ -1,0 +1,3 @@
+alias login="~/projects/timesheet/src/login.js"
+alias logout="~/projects/timesheet/src/logout.js"
+alias timesheet="~/projects/timesheet/src/cli.js"
