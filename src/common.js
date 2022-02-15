@@ -9,41 +9,64 @@
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+import dayjs from 'dayjs'
+const test = !!import.meta.url.endsWith('?test')
+// import debugFunc from 'debug'
+// const debug = debugFunc('@foo-dog/utils:common')
 
-// const options = { debug: false, shouldOutputIntervals: false }
-
-// options.debug = arguments.some(arg => arg === '--debug')
-// // options.debug = process.argv.slice(2).some(arg => arg === '--debug')
-
-// debug('process.argv=', process.argv)
-
-function createDateString(offsetMinutes, date = new Date()) {
-  date.setMinutes(date.getMinutes() - offsetMinutes)
-  const [month, day, year]       = [date.getMonth() + 1, date.getDate(), date.getFullYear()].map(val => val.toString())
-  const [hours, minutes, timezoneOffset] = [date.getHours(), date.getMinutes(), date.getTimezoneOffset()]
-  return `${year}-${month.padStart(2, 0)}-${(day).padStart(2, 0)}T${hours.toString().padStart(2, 0)}:${minutes.toString().padStart(2, 0)}${(timezoneOffset < 0 ? '+' : '-')}${(Math.floor(timezoneOffset / 60)).toString().padStart(2, 0)}:${(Math.floor(timezoneOffset % 60)).toString().padStart(2, 0)}`
+function createDateString(offsetHours = 0, offsetMinutes = 0, date = new Date()) {
+  if (typeof offsetHours === 'object' && offsetMinutes === 0) {
+    date = offsetHours
+    offsetHours = 0
+  }
+  if (typeof offsetMinutes === 'object') {
+    date = offsetMinutes
+    offsetMinutes = 0
+  }
+  const dateToUse = dayjs(date).subtract(offsetHours, 'h').subtract(offsetMinutes, 'm')
+  return dayjs(dateToUse).format('YYYY-MM-DDTHH:mmZ')
 }
 
 function appendTimestamp(str, opt) {
-  const options = Object.assign({}, opt, { filename: os.homedir() + '/timesheet.txt', offset: 0 })
-  const dateStr = createDateString(options.offset)
+  const options = Object.assign({ filename: os.homedir() + '/timesheet.txt', offset_hours: 0, offset_minutes: 0 }, opt)
+  console.log('options=', options)
+  const dateStr = createDateString(options.offset_hours, options.offset_minutes)
   fs.appendFileSync(path.resolve(options.filename), dateStr + ` ${str}\n`)
 }
 
 function getOptions(args) {
-  const options = { offset: 0 }
+  const options = { offset_hours: 0, offset_minutes: 0 }
 
   args.forEach(arg => {
     if (arg === '--help' || arg === '-h') {
       console.log(`Write a timestamp to ~/timesheet.txt. \n  Usage: ${process.argv0} ${process.argv[1]} [offset in minutes]`)
       process.exit()
     }
+    else if (arg.endsWith('h')) {
+      try {
+        options.offset_hours = parseInt(arg.slice(0, -1))
+      } catch (ignore) {
+        console.log('Could not parse "' + arg + '". Did you mean "[number of hours]h"?')
+        process.exit()
+      }
+    }
+    else if (arg.endsWith('m')) {
+      try {
+        options.offset_minutes = parseInt(arg.slice(0, -1))
+      } catch (ignore) {
+        console.log('Could not parse "' + arg + '". Did you mean "[number of minutes]m"?')
+        process.exit()
+      }
+    }
     else {
       try {
-        options.offset = parseInt(arg)
+        parseInt(arg)
+        console.log('I do not know the units for "' + arg + '". Please append "h" or "m".')
+        if (!test) process.exit()
       } catch (ignore) {}
     }
   })
+
   return options
 }
 

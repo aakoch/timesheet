@@ -1,13 +1,13 @@
 // Copyright (c) 2022, Adam Koch. All rights reserved.
 
 import tap from 'tap'
-import { createDateString, appendTimestamp, getOptions } from '../src/common.js'
+import { createDateString, appendTimestamp, getOptions } from '../src/common.js?test'
 
 tap.test('createDateString with no offset', t => {
 
   const expected = '2022-01-22T22:22-' + (new Date().getTimezoneOffset() / 60).toString().padStart(2, '0') + ':00'
   const date = new Date(2022, 0, 22, 22, 22, 0)
-  t.same(createDateString(0, date), expected)
+  t.same(createDateString(date), expected)
   
   t.end()
 })
@@ -16,18 +16,20 @@ tap.test('createDateString with offset', t => {
 
   const expected = '2022-01-22T22:13-' + (new Date().getTimezoneOffset() / 60).toString().padStart(2, '0') + ':00'
   const date = new Date(2022, 0, 22, 22, 22, 0)
-  t.same(createDateString(9, date), expected)
+  t.same(createDateString(0, 9, date), expected)
   
   t.end()
 })
 
 tap.test('getOptions', t => {
 
-  const input = ['10']
+  const input = ['10h', '5m']
 
-  const expected = { offset: 10 }
+  const expected = { offset_hours: 10, offset_minutes: 5 }
 
-  t.same(getOptions(input), expected)
+  const actual = getOptions(input)
+  console.log('actual=', actual)
+  t.same(actual, expected)
   
   t.end()
 })

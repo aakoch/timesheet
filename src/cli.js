@@ -13,11 +13,11 @@ import { timesheet } from './timesheet.js'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+import Reporter from './reporter.js'
 
 const options = parseArguments(process.argv.slice(2))
 const debug = process.argv.includes('--debug') ? (...objs) => console.log(...objs) : () => {}
 debug('options=', options)
 const input = fs.readFileSync(path.resolve(os.homedir() + '/timesheet.txt')).toString()
-debug('input=', input)
-console.log(timesheet(input, options))
-  
+// debug('input=', input)
+console.log(new Reporter(timesheet(input, options), options).toString())

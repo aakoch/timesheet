@@ -1,148 +1,163 @@
 // Copyright (c) 2022, Adam Koch. All rights reserved.
 
-import tap from 'tap'
-import fs from 'fs'
-import path from 'path'
-import { simpleProjectRootDir } from '@foo-dog/utils'
-import { timesheet, removeRepeats, groupByDates } from '../src/timesheet.js'
-import parseArguments from '../src/parse_arguments.js'
+import tap from "tap";
+import fs from "fs";
+import path from "path";
+import { simpleProjectRootDir } from "@foo-dog/utils";
+import {
+  timesheet,
+  removeRepeats,
+  groupByDates,
+  Interval,
+  Event,
+  convertToEvents
+} from "../src/timesheet.js"
+import Reporter from '../src/reporter.js'
+import parseArguments from "../src/parse_arguments.js";
+import debugFunc from 'debug'
+const debug = debugFunc('timesheet/test')
 
-const filename = simpleProjectRootDir() + '/test/example.txt'
+const filename = simpleProjectRootDir() + "/test/example.txt";
 
-const debug = process.argv.includes('--debug') ? (...objs) => console.log(...objs) : () => {}
+// const debug = process.argv.includes("--debug")
+//   ? (...objs) => console.log(...objs)
+//   : () => {};
 
-const options = Object.assign(parseArguments(process.argv.slice(2)), { outputColor: false })
+const options = Object.assign(parseArguments(process.argv.slice(2)), {
+  outputColor: false,
+});
 
-tap.test('remove intervals of the same event next to each other', t => {
+tap.test("remove intervals of the same event next to each other", (t) => {
+  const input = fs.readFileSync(path.resolve(filename)).toString();
 
-  const input = fs.readFileSync(path.resolve(filename)).toString()
+  const events = input
+    .split("\n")
+    .filter((line) => line.trim().length)
+    .filter((line) => line.startsWith("2")) // might remove this at some point
+    .map((line) => {
+      return Event.parse(line);
+    });
 
-  const step1 = groupByDates(input)
+    const step1 = groupByDates(events);
+    debug('step1=', step1)
+    
+  const actual = removeRepeats(step1);
 
-  const actual = removeRepeats(step1)
-
-  debug('actual=', actual)
+  debug("actual=", actual);
 
   const expected = {
-      "2022-01-27": [
-        {
-          "time": new Date("2022-01-27T14:00:00.000Z"),
-          "event": "login",
-        },
-        {
-          "time": new Date("2022-01-27T18:00:00.000Z"),
-          "event": "logout",
-        },
-        {
-          "time": new Date("2022-01-27T19:00:00.000Z"),
-          "event": "login",
-        },
-        {
-          "time": new Date("2022-01-28T00:00:00.000Z"),
-          "event": "logout",
-        },
-      ]
-    }
+    "2022-01-27": [
+      {
+        instant: new Date("2022-01-27T14:00:00.000Z"),
+        name: "login",
+      },
+      {
+        instant: new Date("2022-01-27T18:00:00.000Z"),
+        name: "logout",
+      },
+      {
+        instant: new Date("2022-01-27T19:00:00.000Z"),
+        name: "login",
+      },
+      {
+        instant: new Date("2022-01-28T00:00:00.000Z"),
+        name: "logout",
+      },
+    ],
+  };
 
-  debug('expected=', expected)
+  debug("expected=", expected);
 
-  t.same(actual, expected)
-  
-  t.end()
-})
+  t.same(actual, expected);
 
-tap.test('testing removing intervals from just one entry', t => {
+  t.end();
+});
 
-  const input = fs.readFileSync(path.resolve(filename)).toString().split('\n')[0]
+tap.test("testing removing intervals from just one entry", (t) => {
+  const input = fs
+    .readFileSync(path.resolve(filename))
+    .toString()
+    .split("\n")[0];
 
-  const step1 = groupByDates(input)
+  const events = convertToEvents(input)
 
-  const actual = removeRepeats(step1)
+  const step1 = groupByDates(events);
 
-  debug('actual=', actual)
+  const actual = removeRepeats(step1);
 
-  t.same(actual['2022-01-27'][0].event, 'login')
-  
-  t.end()
-})
+  debug("actual=", actual);
 
-tap.test('no intervals printed', t => {
+  t.same(actual["2022-01-27"][0].name, "login");
 
-  const input = fs.readFileSync(path.resolve(filename)).toString()
+  t.end();
+});
 
-  const actual = timesheet(input, options)
+tap.test("no intervals printed", (t) => {
+  const input = fs.readFileSync(path.resolve(filename)).toString();
 
-  debug('actual=', actual)
+  const actual = timesheet(input, options);
 
-  const expected = "2022-01-27 total is  9 hours,  0 minutes"
+  debug("actual=", actual);
 
-  debug('expected=', expected)
+  const expected = "2022-01-27 total is  9 hours,  0 minutes";
 
-  t.same(actual, expected)
-  
-  t.end()
-})
+  debug("expected=", expected);
 
-tap.test('running total', t => {
+  t.same(new Reporter(actual, options).toString(), expected);
 
-  const input = fs.readFileSync(path.resolve(filename)).toString().split('\n')[0]
+  t.end();
+});
 
-  const actual = timesheet(input, options)
+tap.test("running total", (t) => {
+  const input = fs
+    .readFileSync(path.resolve(filename))
+    .toString()
+    .split("\n")[0];
 
-  debug('actual=', actual)
+  const actual = timesheet(input, options);
 
-  t.match(actual, /.*and counting/)
-  
-  t.end()
-})
+  debug("actual=", actual);
 
-tap.test('only minutes', t => {
+  t.match(new Reporter(actual, options).toString(), /.*and counting/);
 
-  const input = fs.readFileSync(path.resolve(simpleProjectRootDir() + '/test/only_minutes.txt')).toString()
+  t.end();
+});
 
-  const actual = timesheet(input, options)
+tap.test("only minutes", (t) => {
+  const input = fs
+    .readFileSync(
+      path.resolve(simpleProjectRootDir() + "/test/only_minutes.txt")
+    )
+    .toString();
 
-  debug('actual=', actual)
+  const actual = timesheet(input, options);
 
-  const expected = "2022-01-27 total is           30 minutes"
+  debug("actual=", actual);
 
-  debug('expected=', expected)
+  const expected = "2022-01-27 total is            1 minute ";
 
-  t.same(actual, expected)
-  
-  t.end()
-})
+  debug("expected=", expected);
 
-tap.test('intervals printed', t => {
+  t.same(new Reporter(actual, options).toString(), expected);
 
-  const input = fs.readFileSync(path.resolve(filename)).toString()
+  t.end();
+});
 
-  const actual = timesheet(input, options)
+tap.test("intervals printed", (t) => {
+  const input = fs.readFileSync(path.resolve(filename)).toString();
 
-  debug('actual=', actual)
+  const actual = timesheet(input, options);
 
-  const expected = "2022-01-27 total is  9 hours,  0 minutes"
+  debug("actual=", actual);
 
-  debug('expected=', expected)
+  const expected = " - 08:00 to 12:00  4 hours,  0 minutes\n - 13:00 to 18:00  5 hours,  0 minutes\n2022-01-27 total is  9 hours,  0 minutes";
 
-  t.same(actual, expected)
-  
-  t.end()
-})
+  debug("expected=", expected);
 
-tap.test(undefined, t => {
+  options.outputIntervals = true
 
-  const input = fs.readFileSync(path.resolve(filename)).toString()
+  t.same(new Reporter(actual, options).toString(), expected);
 
-  const actual = timesheet(input, options)
+  t.end();
+});
 
-  debug('actual=', actual)
-
-  const expected = "2022-01-27 total is  9 hours,  0 minutes"
-
-  debug('expected=', expected)
-
-  t.same(actual, expected)
-  
-  t.end()
-})
