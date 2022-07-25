@@ -14,76 +14,71 @@
  *   logout='echo $(gdate -Iminutes) logout >> ~/timesheet.txt'
  */
 
-import chalk from "chalk";
-import dayjs from "dayjs";
-import dayjsUtc from "dayjs/plugin/utc.js";
-import dayjsTimezone from "dayjs/plugin/timezone.js";
-dayjs.extend(dayjsUtc);
-dayjs.extend(dayjsTimezone);
+import chalk from 'chalk'
+import dayjs from 'dayjs'
+import dayjsUtc from 'dayjs/plugin/utc.js'
+import dayjsTimezone from 'dayjs/plugin/timezone.js'
+dayjs.extend(dayjsUtc)
+dayjs.extend(dayjsTimezone)
 
-const debug = process.argv.includes("--debug")
-  ? (...objs) => console.log(...objs)
-  : () => {};
+const debug = process.argv.includes('--debug') ? (...objs) => console.log(...objs) : () => {}
 
 class Duration {
   constructor(minutes) {
-    this.minutes = minutes;
+    this.minutes = minutes
   }
   toString() {
-    const strArr = [];
-    const hours = Math.floor(this.minutes / 60);
-    let minutes = this.minutes;
+    const strArr = []
+    const hours = Math.floor(this.minutes / 60)
+    let minutes = this.minutes
     if (hours) {
-      strArr.push(hours.toString().padStart(2, " "));
-      strArr.push(" hour" + (Math.round(hours) == 1 ? ",  " : "s, "));
-      minutes = this.minutes % 60;
+      strArr.push(hours.toString().padStart(2, ' '))
+      strArr.push(' hour' + (Math.round(hours) == 1 ? ',  ' : 's, '))
+      minutes = this.minutes % 60
     } else {
-      strArr.push(" ".repeat(10));
+      strArr.push(' '.repeat(10))
     }
-    strArr.push(Math.round(minutes).toString().padStart(2, " "));
-    strArr.push(" minute" + (Math.round(minutes) == 1 ? " " : "s"));
-    return strArr.join("");
+    strArr.push(Math.round(minutes).toString().padStart(2, ' '))
+    strArr.push(' minute' + (Math.round(minutes) == 1 ? ' ' : 's'))
+    return strArr.join('')
   }
 }
 
 class Interval {
   constructor(startInstant, endInstant, running) {
-    this.startInstant = startInstant;
-    this.endInstant = endInstant;
-    this.duration = new Duration(this.timeBetween(startInstant, endInstant));
+    this.startInstant = startInstant
+    this.endInstant = endInstant
+    this.duration = new Duration(this.timeBetween(startInstant, endInstant))
     this.running = running
   }
   timeBetween(startInstant, endInstant) {
-    return (endInstant - startInstant) / 60000;
+    return (endInstant - startInstant) / 60000
   }
   toString() {
-    const toTime = !!this.endInstant ? toTimeString(this.endInstant) : "now  "
-    return toTimeString(this.startInstant) + " to " + toTime + ' ' + this.duration.toString()
+    const toTime = !!this.endInstant ? toTimeString(this.endInstant) : 'now  '
+    return toTimeString(this.startInstant) + ' to ' + toTime + ' ' + this.duration.toString()
   }
 }
 
 class Event {
   constructor(instant, name) {
-    this.instant = instant;
-    this.name = name;
+    this.instant = instant
+    this.name = name
   }
 
   static parse(line) {
-    const lineParts = line.split(" ");
-    return new Event(new Date(lineParts[0]), lineParts[1]);
+    const lineParts = line.split(' ')
+    return new Event(new Date(lineParts[0]), lineParts[1])
   }
-
   get [Symbol.toStringTag]() {
-    return `Event { instant: ${dayjs(this.instant).format(
-      "YYYY-MM-DDTHH:mm:ssZ[Z]"
-    )}, name: '${this.name}' }`;
+    return `Event { instant: ${dayjs(this.instant).format('YYYY-MM-DDTHH:mm:ssZ[Z]')}, name: '${this.name}' }`
   }
 }
 
 class EventAdapter extends Event {
   constructor(eventLikeObject) {
-    super(eventLikeObject.event, eventLikeObject.instant);
-    this.usingRunningIntervals = eventLikeObject.usingRunningIntervals;
+    super(eventLikeObject.event, eventLikeObject.instant)
+    this.usingRunningIntervals = eventLikeObject.usingRunningIntervals
   }
 }
 
@@ -93,68 +88,61 @@ class Summary {
     this.intervals = intervals
     this.total = total
   }
-
 }
 
 function convertToEvents(text) {
   return text
-    .split("\n")
-    .filter((line) => line.trim().length)
-    .filter((line) => line.startsWith("2")) // might remove this at some point
-    .map((line) => {
-      return Event.parse(line);
-    });
+    .split('\n')
+    .filter(line => line.trim().length)
+    .filter(line => line.startsWith('2')) // might remove this at some point
+    .map(line => {
+      return Event.parse(line)
+    })
 }
 
 function toDateString(date) {
-  return dayjs(date).format("YYYY-MM-DD");
+  return dayjs(date).format('YYYY-MM-DD')
 }
 
 function toTimeString(date) {
-  return dayjs(date).format("HH:mm");
+  return dayjs(date).format('HH:mm')
 }
 
 function removeRepeats(groupedByDates) {
   const entries = Object.entries(groupedByDates).map(([key, events]) => {
     // can the reverse below be removed with a reduceRight here?
-    const newIntervals = events.reduce(
-      (previousIterations, currentIteration) => {
-        if (
-          previousIterations[0] &&
-          currentIteration.name === previousIterations[0].name
-        ) {
-          if (currentIteration.name === "login") {
-          } else if (currentIteration.name === "logout") {
-            previousIterations[0] = currentIteration;
-          }
-        } else {
-          previousIterations.unshift(currentIteration);
+    const newIntervals = events.reduce((previousIterations, currentIteration) => {
+      if (previousIterations[0] && currentIteration.name === previousIterations[0].name) {
+        if (currentIteration.name === 'login') {
+        } else if (currentIteration.name === 'logout') {
+          previousIterations[0] = currentIteration
         }
-        return previousIterations;
-      },
-      []
-    );
+      } else {
+        previousIterations.unshift(currentIteration)
+      }
+      return previousIterations
+    }, [])
     // can this reverse be replaced with a reduceRight above?
-    return [key, newIntervals.reverse()];
-  });
-  debug("entries=", entries);
-  return Object.fromEntries(entries);
+    return [key, newIntervals.reverse()]
+  })
+  debug('entries=', entries)
+  return Object.fromEntries(entries)
 }
 
 function groupByDates(events, removeRepeats) {
   const groupedByDates = events.reduce((previousVal, currentVal) => {
-    let dates = Object.assign({}, previousVal);
-    const obj = currentVal;
-    const dateString = dayjs(currentVal.instant).format("YYYY-MM-DD");
+    let dates = Object.assign({}, previousVal)
+    const obj = currentVal
+    const dateString = dayjs(currentVal.instant).format('YYYY-MM-DD')
     if (previousVal.hasOwnProperty(dateString)) {
-      dates[dateString] = previousVal[dateString].concat(obj);
+      dates[dateString] = previousVal[dateString].concat(obj)
     } else {
-      dates[dateString] = [obj];
+      dates[dateString] = [obj]
     }
-    return dates;
-  }, {});
+    return dates
+  }, {})
 
-  return groupedByDates;
+  return groupedByDates
 }
 
 class StartPeriodEvent extends Event {
@@ -171,164 +159,84 @@ class EndPeriodEvent extends Event {
   }
 }
 
-function createIntervals(events) {
-  debug('events=', events)
+// Cases:
+// Normal: first event is login, last event is logout
+// Span days: last event of the day is login, first event of the following day is logout - need to constrain
+// No logout: last event of the day is login, first event of the following day is login
+// No login: first event of the day is logout, last event of the previous day is logout
+
+function createInterval(beginningEvent, endingEvent) {
+  return new Interval(beginningEvent.instant, endingEvent.instant)
+}
+
+function createIntervals(events, day) {
+  console.log('day=', day)
+  let state = START
   const intervals = []
-  let running = false
-  for (let index = 0; index < events.length;) {
-    running = false
-    const loginEvent = events[index].name == 'login' ? events[index] : StartPeriodEvent.from(events[index])
-    let logoutEvent
-    if (index + 1 < events.length && events[index + 1].name == 'logout') {
-      logoutEvent = events[index + 1]
+  for (let index = 0; index < events.length; index++) {
+    const currentEvent = events[index]
+    const nextEvent = index < events.length - 1 ? events[index + 1] : null
+    if (currentEvent.name === 'login' && nextEvent === null) {
+      console.log('only 1 event')
+      if (day === toDateString(new Date())) {
+        intervals.push(new Interval(null, null, true))
+      }
+      else {
+        console.log('Last event of the day was a login=', currentEvent)
+        intervals.push('Last event of the day was a login at ' + toTimeString(currentEvent.instant))
+      }
+    } else if (currentEvent.name === 'login' && nextEvent.name === 'logout') {
+      const interval = createInterval(currentEvent, nextEvent)
+      console.log('interval1=', interval)
+      intervals.push(interval)
+      index++
+    } else if (state === START && currentEvent.name === 'logout') {
+        console.log('First event of the day was a logout=', currentEvent)
+        intervals.push('First event of the day was a logout at ' + toTimeString(currentEvent.instant))
     }
     else {
-      logoutEvent = EndPeriodEvent.from(events[index])
-      running = true
+      console.log('skipping event=', currentEvent)
     }
-
-    intervals.push(new Interval(loginEvent.instant, logoutEvent.instant, running))
-
-    if (loginEvent != null) index++
-    if (logoutEvent != null) index++
+    state = NOT_START
   }
   return intervals
 }
 
 function calculateTotal(intervals) {
   let total = intervals.reduce((total, currentInterval) => {
-    return total + currentInterval.duration.minutes
+    return total + (typeof currentInterval === 'string' ? 0 : currentInterval.duration.minutes)
   }, 0)
 
   return total
-  // for (let index = 0; index < events.length; index += 2) {
-  //   const loginEvent = events[index];
-  //   const logoutEvent = events[index + 1]
-  //   intervals.push(new Interval(loginEvent.instant, logoutEvent.instant))
-  // }
-  // return intervals
 }
 
-// function summarizePeriod(eventsForPeriod) {
-
-//   const retArr = [];
-//   let runningTotal = 0;
-//   for (let index = 1; index < eventsForPeriod.length; index++) {
-//     const singleDayEvent = eventsForPeriod[index];
-//     const currentIntervalMinutes =
-//       (singleDayEvent.instant - eventsForPeriod[index - 1].instant) / 60000;
-//     let total = new Duration(runningTotal + currentIntervalMinutes);
-//     let interval = createInterval(
-//       eventsForPeriod[index - 1],
-//       singleDayEvent,
-//       currentIntervalMinutes
-//     );
-//     let retObj = { intervals: [] };
-//     retObj.total = total;
-//     retObj.intervals.push(interval);
-//     if (
-//       singleDayEvent.name === "currentTime" &&
-//       eventsForPeriod[index - 1].name === "login"
-//     ) {
-//       retObj.running = new Duration(currentIntervalMinutes);
-//       retObj.name = "running";
-//     }
-//     retArr.push(retObj);
-//   }
-//   return ;
-// }
+const START = 0
+const NOT_START = 1
 
 function timesheet(input, options) {
-  const events = convertToEvents(input);
+  const events = convertToEvents(input)
 
-  debug("typeof events=", typeof events);
-  debug("options=", options);
+  debug('typeof events=', typeof events)
+  debug('options=', options)
 
-  // const groupByHour = groupByHour(events)
+  const groupedByDates = groupByDates(events)
 
-  const groupedByDates = groupByDates(events);
+  debug('groupedByDates=', groupedByDates)
 
-  debug("groupedByDates=", groupedByDates);
+  const uniqueGroupedByDates = removeRepeats(groupedByDates)
 
-  const dupsRemoved = removeRepeats(groupedByDates);
-
-  debug("dupsRemoved=" + dupsRemoved);
+  debug('uniqueGroupedByDates=' + uniqueGroupedByDates)
 
   // const summary = createSummary()
-  const summaries = Object.entries(dupsRemoved).map(([key, val]) => {
+  const summaries = Object.entries(uniqueGroupedByDates).map(([key, val]) => {
     const singleDayEvents = val
-    debug(singleDayEvents)
-    
-  // }
 
-  // Object.keys(dupsRemoved).forEach((day) => {
-  //   let singleDayEvents = dupsRemoved[day];
-    // singleDayEvents.push(
-    //   new EventAdapter({
-    //     event: "currentTime",
-    //     time: new Date(),
-    //     usingRunningIntervals: true,
-    //   })
-    // )
-
-    
-    const intervals = createIntervals(singleDayEvents)
+    const intervals = createIntervals(singleDayEvents, key)
     const total = calculateTotal(intervals)
-    // const summary = summarizePeriod(singleDayEvents);
-
-    // console.log("summary=", summary);
-
-    // delete summary.time;
-
-    // if (summary.hasOwnProperty("total")) {
-    //   const appendix = summary.name === "running" ? " and counting" : "";
-    //   debug("duration.total=", summary.total);
-    //   let colorFunction;
-    //   debug("options.outputColor=", options.outputColor);
-    //   if (!options.outputColor) {
-    //     colorFunction = (input) => input;
-    //   } else if (summary.total.minutes > 24 * 60) {
-    //     colorFunction = chalk.red;
-    //   } else {
-    //     colorFunction = chalk.blue;
-    //   }
-    //   retArr.push(
-    //     colorFunction(day + " total is " + summary.total.toString() + appendix)
-    //   );
-    // } else if (summary.hasOwnProperty("running")) {
-    //   console.log(day + " running time is " + summary.running.toString());
-    // }
-    // if (
-    //   options.outputIntervals &&
-    //   (summary.hasOwnProperty("intervals") ||
-    //     summary.hasOwnProperty("runningIntervals"))
-    // ) {
-    //   // const intervalKey =
-    //   debug("duration=", summary);
-    //   retArr.push(
-    //     summary.intervals
-    //       .map(
-    //         (interval) =>
-    //           (debug(interval) && false) ||
-    //           " - " + Object.keys(interval) + " = " + Object.values(interval)
-    //       )
-    //       .join("\n")
-    //   );
-    // }
     return new Summary(key, intervals, total)
   })
 
-  return summaries;
+  return summaries
 }
 
-export {
-  timesheet,
-  groupByDates,
-  toDateString,
-  toTimeString,
-  removeRepeats,
-  Interval,
-  Event,
-  convertToEvents,
-  Duration
-};
+export { timesheet, groupByDates, toDateString, toTimeString, removeRepeats, Interval, Event, convertToEvents, Duration }
