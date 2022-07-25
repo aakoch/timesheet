@@ -78,19 +78,7 @@ class Event {
       "YYYY-MM-DDTHH:mm:ssZ[Z]"
     )}, name: '${this.name}' }`;
   }
-
-  toString() {
-    return `Event { instant: ${dayjs(this.instant).format(
-      "YYYY-MM-DDTHH:mm:ssZ[Z]"
-    )}, name: '${this.name}' }`;
-  }
 }
-
-Event.prototype.toString = function EventToString() {
-  return `Event { instant: ${dayjs(this.instant).format(
-    "YYYY-MM-DDTHH:mm:ssZ[Z]"
-  )}, name: '${this.name}' }`;
-};
 
 class EventAdapter extends Event {
   constructor(eventLikeObject) {
