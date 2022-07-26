@@ -56,7 +56,7 @@ class Interval {
   }
   toString() {
     const toTime = !!this.endInstant ? toTimeString(this.endInstant) : 'now  '
-    return toTimeString(this.startInstant) + ' to ' + toTime + ' ' + this.duration.toString()
+    return toTimeString(this.startInstant) + ' to ' + toTime + '   ' + this.duration.toString()
   }
 }
 
@@ -179,7 +179,7 @@ function createIntervals(events, day) {
     if (currentEvent.name === 'login' && nextEvent === null) {
       console.log('only 1 event')
       if (day === toDateString(new Date())) {
-        intervals.push(new Interval(null, null, true))
+        intervals.push(new Interval(currentEvent.instant, new Date(), true))
       }
       else {
         console.log('Last event of the day was a login=', currentEvent)
