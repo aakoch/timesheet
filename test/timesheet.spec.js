@@ -154,7 +154,7 @@ tap.test("intervals printed", (t) => {
 
   debug("actual=", actual);
 
-  const expected = " - 08:00 to 12:00  4 hours,  0 minutes\n - 13:00 to 18:00  5 hours,  0 minutes\n2022-01-27 total is  9 hours,  0 minutes";
+  const expected = " - 08:00 to 12:00    4 hours,  0 minutes\n - 13:00 to 18:00    5 hours,  0 minutes\n2022-01-27 total is  9 hours,  0 minutes";
 
   debug("expected=", expected);
 
@@ -172,7 +172,7 @@ const input = fs.readFileSync(path.resolve(simpleProjectRootDir() + "/test/bug1.
 
   debug("actual=", actual);
 
-  const expected = " - First event of the day was a logout at 08:35\n - 08:40 to 10:10  1 hour,  30 minutes\n - 10:50 to 11:04           14 minutes\n2022-04-28 total is  1 hour,  44 minutes";
+  const expected = " - First event of the day was a logout at 08:35\n - 08:40 to 10:10    1 hour,  30 minutes\n - 10:50 to 11:04             14 minutes\n2022-04-28 total is  1 hour,  44 minutes";
 
   debug("expected=", expected);
 
