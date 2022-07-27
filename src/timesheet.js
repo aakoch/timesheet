@@ -170,32 +170,32 @@ function createInterval(beginningEvent, endingEvent) {
 }
 
 function createIntervals(events, day) {
-  console.log('day=', day)
+  debug('day=', day)
   let state = START
   const intervals = []
   for (let index = 0; index < events.length; index++) {
     const currentEvent = events[index]
     const nextEvent = index < events.length - 1 ? events[index + 1] : null
     if (currentEvent.name === 'login' && nextEvent === null) {
-      console.log('only 1 event')
+      debug('only 1 event')
       if (day === toDateString(new Date())) {
         intervals.push(new Interval(currentEvent.instant, new Date(), true))
       }
       else {
-        console.log('Last event of the day was a login=', currentEvent)
+        debug('Last event of the day was a login=', currentEvent)
         intervals.push('Last event of the day was a login at ' + toTimeString(currentEvent.instant))
       }
     } else if (currentEvent.name === 'login' && nextEvent.name === 'logout') {
       const interval = createInterval(currentEvent, nextEvent)
-      console.log('interval1=', interval)
+      debug('interval1=', interval)
       intervals.push(interval)
       index++
     } else if (state === START && currentEvent.name === 'logout') {
-        console.log('First event of the day was a logout=', currentEvent)
+        debug('First event of the day was a logout=', currentEvent)
         intervals.push('First event of the day was a logout at ' + toTimeString(currentEvent.instant))
     }
     else {
-      console.log('skipping event=', currentEvent)
+      debug('skipping event=', currentEvent)
     }
     state = NOT_START
   }
@@ -239,4 +239,4 @@ function timesheet(input, options) {
   return summaries
 }
 
-export { timesheet, groupByDates, toDateString, toTimeString, removeRepeats, Interval, Event, convertToEvents, Duration }
+export { timesheet, groupByDates, toDateString, toTimeString, removeRepeats, Interval, Event, convertToEvents, Duration, Summary }

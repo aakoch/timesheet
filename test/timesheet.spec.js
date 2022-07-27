@@ -18,7 +18,8 @@ import {
   groupByDates,
   Interval,
   Event,
-  convertToEvents
+  convertToEvents,
+  Summary
 } from "../src/timesheet.js"
 import Reporter from '../src/reporter.js'
 import parseArguments from "../src/parse_arguments.js";
@@ -172,13 +173,29 @@ const input = fs.readFileSync(path.resolve(simpleProjectRootDir() + "/test/bug1.
 
   debug("actual=", actual);
 
-  const expected = " - First event of the day was a logout at 08:35\n - 08:40 to 10:10    1 hour,  30 minutes\n - 10:50 to 11:04             14 minutes\n2022-04-28 total is  1 hour,  44 minutes";
+  const expected = [
+    new Summary(
+      '2022-04-28',
+      [
+        'First event of the day was a logout at 08:35',
+        new Interval(new Date('2022-04-28T13:40:00.000Z'), new Date('2022-04-28T15:10:00.000Z')),
+        new Interval(new Date('2022-04-28T15:50:00.000Z'), new Date('2022-04-28T16:04:00.000Z')),
+      ],
+      104
+    ),
+  ]
+
+  const expectedAsString =
+    ' - First event of the day was a logout at 08:35\n - 08:40 to 10:10    1 hour,  30 minutes\n - 10:50 to 11:04             14 minutes\n2022-04-28 total is  1 hour,  44 minutes'
 
   debug("expected=", expected);
 
+
+  t.same(actual, expected);
+
   options.outputIntervals = true
 
-  t.same(new Reporter(actual, options).toString(), expected);
+  t.same(new Reporter(actual, options).toString(), expectedAsString);
 
   t.end();
 });

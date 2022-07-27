@@ -38,7 +38,6 @@ tap.test('getOptions', t => {
   const expected = { offset_hours: 10, offset_minutes: 5 }
 
   const actual = getOptions(input)
-  console.log('actual=', actual)
   t.same(actual, expected)
   
   t.end()
