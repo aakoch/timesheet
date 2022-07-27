@@ -41,24 +41,21 @@ function getOptions(args) {
     if (arg === '--help' || arg === '-h') {
       console.log(`Write a timestamp to ~/timesheet.txt. \n  Usage: ${process.argv0} ${process.argv[1]} [offset in minutes]`)
       process.exit()
-    }
-    else if (arg.endsWith('h')) {
+    } else if (arg.endsWith('h')) {
       try {
         options.offset_hours = parseInt(arg.slice(0, -1))
       } catch (ignore) {
         console.log('Could not parse "' + arg + '". Did you mean "[number of hours]h"?')
         process.exit()
       }
-    }
-    else if (arg.endsWith('m')) {
+    } else if (arg.endsWith('m')) {
       try {
         options.offset_minutes = parseInt(arg.slice(0, -1))
       } catch (ignore) {
         console.log('Could not parse "' + arg + '". Did you mean "[number of minutes]m"?')
         process.exit()
       }
-    }
-    else {
+    } else {
       try {
         parseInt(arg)
         console.log('I do not know the units for "' + arg + '". Please append "h" or "m".')
@@ -70,6 +67,4 @@ function getOptions(args) {
   return options
 }
 
-export {
-  createDateString, appendTimestamp, getOptions
-}
+export { createDateString, appendTimestamp, getOptions }

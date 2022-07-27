@@ -11,38 +11,34 @@
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 export default function parseArguments(args) {
-  const options = { debug: false, outputIntervals: false, outputColor: true };
+  const options = { debug: false, outputIntervals: false, outputColor: true }
 
-  const debug = process.argv.slice(2).includes("--debug")
-    ? (...objs) => console.log(...objs)
-    : () => {};
+  const debug = process.argv.slice(2).includes('--debug') ? (...objs) => console.log(...objs) : () => {}
 
-  debug("args=", args);
+  debug('args=', args)
 
-  const leftoverArgs = args.filter((arg) => {
-    if (arg === "--help" || arg === "-h") {
-      console.log(
-        "Display hours worked per day. Options include\n  --debug\n  --printIntervals\n  --no-color"
-      );
-      process.exit();
-    } else if (arg === "--printIntervals") {
-      options.outputIntervals = true;
-      return false;
-    } else if (arg === "--debug") {
-      options.debug = true;
-      return false;
-    } else if (arg === "--no-color") {
-      options.outputColor = false;
-      return false;
+  const leftoverArgs = args.filter(arg => {
+    if (arg === '--help' || arg === '-h') {
+      console.log('Display hours worked per day. Options include\n  --debug\n  --printIntervals\n  --no-color')
+      process.exit()
+    } else if (arg === '--printIntervals') {
+      options.outputIntervals = true
+      return false
+    } else if (arg === '--debug') {
+      options.debug = true
+      return false
+    } else if (arg === '--no-color') {
+      options.outputColor = false
+      return false
     }
-    return true;
-  });
+    return true
+  })
 
   if (leftoverArgs.length > 0) {
-    console.error("Invalid options: " + leftoverArgs.join(", "));
+    console.error('Invalid options: ' + leftoverArgs.join(', '))
   }
 
-  debug("outputIntervals=", options.outputIntervals);
+  debug('outputIntervals=', options.outputIntervals)
 
-  return options;
+  return options
 }

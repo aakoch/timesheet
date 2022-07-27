@@ -12,33 +12,30 @@ import tap from 'tap'
 import { createDateString, appendTimestamp, getOptions } from '../src/common.js?test'
 
 tap.test('createDateString with no offset', t => {
-
   const expected = '2022-01-22T22:22-06:00' // works only in CST
   // const expected = '2022-01-22T22:22+00:00' // works only in UTC - see package.json on how to tell NodeJS to use UTC
   const date = new Date(2022, 0, 22, 22, 22, 0)
   t.same(createDateString(date), expected)
-  
+
   t.end()
 })
 
 tap.test('createDateString with offset', t => {
-
   const expected = '2022-01-22T22:13-06:00' // works only in CST
   // const expected = '2022-01-22T22:13+00:00' // works only in UTC - see package.json on how to tell NodeJS to use UTC
   const date = new Date(2022, 0, 22, 22, 22, 0)
   t.same(createDateString(0, 9, date), expected)
-  
+
   t.end()
 })
 
 tap.test('getOptions', t => {
-
   const input = ['10h', '5m']
 
   const expected = { offset_hours: 10, offset_minutes: 5 }
 
   const actual = getOptions(input)
   t.same(actual, expected)
-  
+
   t.end()
 })

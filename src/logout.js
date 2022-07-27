@@ -8,6 +8,6 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { appendTimestamp, getOptions } from "./common.js"
+import { appendTimestamp, getOptions } from './common.js'
 
-appendTimestamp('logout', getOptions(process.argv.slice(2)));
+appendTimestamp('logout', getOptions(process.argv.slice(2)))

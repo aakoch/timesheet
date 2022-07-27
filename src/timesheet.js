@@ -180,8 +180,7 @@ function createIntervals(events, day) {
       debug('only 1 event')
       if (day === toDateString(new Date())) {
         intervals.push(new Interval(currentEvent.instant, new Date(), true))
-      }
-      else {
+      } else {
         debug('Last event of the day was a login=', currentEvent)
         intervals.push('Last event of the day was a login at ' + toTimeString(currentEvent.instant))
       }
@@ -191,10 +190,9 @@ function createIntervals(events, day) {
       intervals.push(interval)
       index++
     } else if (state === START && currentEvent.name === 'logout') {
-        debug('First event of the day was a logout=', currentEvent)
-        intervals.push('First event of the day was a logout at ' + toTimeString(currentEvent.instant))
-    }
-    else {
+      debug('First event of the day was a logout=', currentEvent)
+      intervals.push('First event of the day was a logout at ' + toTimeString(currentEvent.instant))
+    } else {
       debug('skipping event=', currentEvent)
     }
     state = NOT_START
