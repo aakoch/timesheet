@@ -10,6 +10,7 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 import dayjs from 'dayjs'
+import chalk from 'chalk'
 const test = !!import.meta.url.endsWith('?test')
 // import debugFunc from 'debug'
 // const debug = debugFunc('@foo-dog/utils:common')
@@ -29,9 +30,9 @@ function createDateString(offsetHours = 0, offsetMinutes = 0, date = new Date())
 
 function appendTimestamp(str, opt) {
   const options = Object.assign({ filename: os.homedir() + '/timesheet.txt', offset_hours: 0, offset_minutes: 0 }, opt)
-  console.log('options=', options)
   const dateStr = createDateString(options.offset_hours, options.offset_minutes)
   fs.appendFileSync(path.resolve(options.filename), dateStr + ` ${str}\n`)
+  console.log(`${chalk.cyanBright('Success!')} ${chalk.bold(str)} event added to ${path.basename(options.filename)} at ${chalk.bold(dateStr)}`)
 }
 
 function getOptions(args) {
