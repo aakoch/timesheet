@@ -46,10 +46,10 @@ class Reporter {
         }
         const lastInterval = summary.intervals[summary.intervals.length - 1]
         debug('last interval=', lastInterval)
-        const running = lastInterval?.running
+        const running = typeof lastInterval === 'string' || lastInterval?.running
         const andCounting = running ? ' and counting' : ''
-        const runningMinutes = running ? lastInterval.duration.minutes : 0
-        return intervalsString + colorFunction(`${summary.period} total is ${this.humanize(summary.total + runningMinutes)}${andCounting}`)
+        // const runningMinutes = running ? lastInterval.duration.minutes : 0
+        return intervalsString + colorFunction(`${summary.period} total is ${this.humanize(summary.total)}${andCounting}`)
       })
       .join('\n')
   }
