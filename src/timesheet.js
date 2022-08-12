@@ -14,15 +14,22 @@
  *   logout='echo $(gdate -Iminutes) logout >> ~/timesheet.txt'
  */
 
-import chalk from 'chalk'
 import dayjs from 'dayjs'
 import dayjsUtc from 'dayjs/plugin/utc.js'
 import dayjsTimezone from 'dayjs/plugin/timezone.js'
+
 dayjs.extend(dayjsUtc)
 dayjs.extend(dayjsTimezone)
 
+let clock = {
+  now: () => {
+    return global.clock ? global.clock.now() :  new Date()
+  }
+}
+
 const debug = process.argv.includes('--debug') ? (...objs) => console.log(...objs) : () => {}
 
+// should I use https://day.js.org/docs/en/plugin/duration ?
 class Duration {
   constructor(minutes) {
     this.minutes = minutes
@@ -33,19 +40,19 @@ class Duration {
     let minutes = this.minutes
     if (hours) {
       strArr.push(hours.toString().padStart(2, ' '))
-      strArr.push(' hour' + (Math.round(hours) == 1 ? ',  ' : 's, '))
+      strArr.push(' hour' + (Math.round(hours) === 1 ? ',  ' : 's, '))
       minutes = this.minutes % 60
     } else {
       strArr.push(' '.repeat(10))
     }
     strArr.push(Math.round(minutes).toString().padStart(2, ' '))
-    strArr.push(' minute' + (Math.round(minutes) == 1 ? ' ' : 's'))
+    strArr.push(' minute' + (Math.round(minutes) === 1 ? ' ' : 's'))
     return strArr.join('')
   }
 }
 
 class Interval {
-  constructor(startInstant, endInstant, running) {
+  constructor(startInstant, endInstant, running = false) {
     this.startInstant = startInstant
     this.endInstant = endInstant
     this.duration = new Duration(this.timeBetween(startInstant, endInstant))
@@ -72,13 +79,6 @@ class Event {
   }
   get [Symbol.toStringTag]() {
     return `Event { instant: ${dayjs(this.instant).format('YYYY-MM-DDTHH:mm:ssZ[Z]')}, name: '${this.name}' }`
-  }
-}
-
-class EventAdapter extends Event {
-  constructor(eventLikeObject) {
-    super(eventLikeObject.event, eventLikeObject.instant)
-    this.usingRunningIntervals = eventLikeObject.usingRunningIntervals
   }
 }
 
@@ -129,8 +129,8 @@ function removeRepeats(groupedByDates) {
   return Object.fromEntries(entries)
 }
 
-function groupByDates(events, removeRepeats) {
-  const groupedByDates = events.reduce((previousVal, currentVal) => {
+function groupByDates(events) {
+  return events.reduce((previousVal, currentVal) => {
     let dates = Object.assign({}, previousVal)
     const obj = currentVal
     const dateString = dayjs(currentVal.instant).format('YYYY-MM-DD')
@@ -141,22 +141,6 @@ function groupByDates(events, removeRepeats) {
     }
     return dates
   }, {})
-
-  return groupedByDates
-}
-
-class StartPeriodEvent extends Event {
-  static from(event) {
-    const instant = dayjs(event.instant).startOf('day')
-    return new Event(instant, 'startOfPeriod')
-  }
-}
-class EndPeriodEvent extends Event {
-  static from(event) {
-    const instant = Math.min(new Date(), dayjs(event.instant))
-    debug('instant=', instant)
-    return new Event(instant, 'endOfPeriod')
-  }
 }
 
 // Cases:
@@ -165,8 +149,8 @@ class EndPeriodEvent extends Event {
 // No logout: last event of the day is login, first event of the following day is login
 // No login: first event of the day is logout, last event of the previous day is logout
 
-function createInterval(beginningEvent, endingEvent) {
-  return new Interval(beginningEvent.instant, endingEvent.instant)
+function createInterval(beginningEvent, endingEvent, running = false) {
+  return new Interval(beginningEvent.instant, endingEvent.instant, running)
 }
 
 function createIntervals(events, day) {
@@ -178,15 +162,17 @@ function createIntervals(events, day) {
     const nextEvent = index < events.length - 1 ? events[index + 1] : null
     if (currentEvent.name === 'login' && nextEvent === null) {
       debug('only 1 event')
-      if (day === toDateString(new Date())) {
-        intervals.push(new Interval(currentEvent.instant, new Date(), true))
+
+      // Should I use https://day.js.org/docs/en/plugin/is-today ?
+      if (day === toDateString(clock.now())) {
+        intervals.push(createInterval(currentEvent, { instant: clock.now()}, true))
       } else {
         debug('Last event of the day was a login=', currentEvent)
         intervals.push('Last event of the day was a login at ' + toTimeString(currentEvent.instant))
       }
     } else if (currentEvent.name === 'login' && nextEvent.name === 'logout') {
       const interval = createInterval(currentEvent, nextEvent)
-      debug('interval1=', interval)
+      debug('interval=', interval)
       intervals.push(interval)
       index++
     } else if (state === START && currentEvent.name === 'logout') {
@@ -201,11 +187,10 @@ function createIntervals(events, day) {
 }
 
 function calculateTotal(intervals) {
-  let total = intervals.reduce((total, currentInterval) => {
-    return total + (typeof currentInterval === 'string' ? 0 : currentInterval.duration.minutes)
+  return intervals.reduce((total, currentInterval) => {
+    return total + (typeof currentInterval === 'string' ? 0
+        : currentInterval.duration.minutes)
   }, 0)
-
-  return total
 }
 
 const START = 0
@@ -226,15 +211,11 @@ function timesheet(input, options) {
   debug('uniqueGroupedByDates=' + uniqueGroupedByDates)
 
   // const summary = createSummary()
-  const summaries = Object.entries(uniqueGroupedByDates).map(([key, val]) => {
-    const singleDayEvents = val
-
+  return Object.entries(uniqueGroupedByDates).map(([key, singleDayEvents]) => {
     const intervals = createIntervals(singleDayEvents, key)
     const total = calculateTotal(intervals)
     return new Summary(key, intervals, total)
   })
-
-  return summaries
 }
 
 export { timesheet, groupByDates, toDateString, toTimeString, removeRepeats, Interval, Event, convertToEvents, Duration, Summary }
