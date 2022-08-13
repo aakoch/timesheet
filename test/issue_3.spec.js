@@ -29,6 +29,7 @@ tap.test('should calculate correct hours', t => {
   let report = new Reporter(actual, options).toString();
   debug("report=", report)
   t.same(actual[1].total, 240)
+  t.same(report.split('\n')[0], '2022-08-10 total is  3 hours, 49 minutes') // <-- Issue 8
   t.same(report.split('\n')[1], '2022-08-11 total is  4 hours,  0 minutes and counting')
   t.end()
 })
