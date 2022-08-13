@@ -1,6 +1,6 @@
 {
   "name": "@aakochnpm/timesheet",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Track log in and log out events and display them in a way to make it easy to submit a timesheet",
   "main": "timesheet.js",
   "scripts": {
