@@ -1,6 +1,6 @@
 {
   "name": "@aakochnpm/timesheet",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Track log in and log out events and display them in a way to make it easy to submit a timesheet",
   "main": "timesheet.js",
   "scripts": {
@@ -32,5 +32,8 @@
   "dependencies": {
     "chalk": "^5.0.1",
     "dayjs": "^1.11.4"
+  },
+  "directories": {
+    "test": "test"
   }
 }
