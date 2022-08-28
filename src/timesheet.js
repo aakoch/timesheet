@@ -9,9 +9,9 @@
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Use in conjunction with "login" and "logout" aliases:
+ * Use in conjunction with "login" and "logoff" aliases:
  *   login='echo $(gdate -Iminutes) login >> ~/timesheet.txt'
- *   logout='echo $(gdate -Iminutes) logout >> ~/timesheet.txt'
+ *   logoff='echo $(gdate -Iminutes) logoff >> ~/timesheet.txt'
  */
 
 import dayjs from 'dayjs'
@@ -114,7 +114,7 @@ function removeRepeats(groupedByDates) {
     const newIntervals = events.reduce((previousIterations, currentIteration) => {
       if (previousIterations[0] && currentIteration.name === previousIterations[0].name) {
         if (currentIteration.name === 'login') {
-        } else if (currentIteration.name === 'logout') {
+        } else if (currentIteration.name === 'logout' || currentIteration.name === 'logoff') {
           previousIterations[0] = currentIteration
         }
       } else {
@@ -144,10 +144,10 @@ function groupByDates(events) {
 }
 
 // Cases:
-// Normal: first event is login, last event is logout
-// Span days: last event of the day is login, first event of the following day is logout - need to constrain
-// No logout: last event of the day is login, first event of the following day is login
-// No login: first event of the day is logout, last event of the previous day is logout
+// Normal: first event is login, last event is logoff
+// Span days: last event of the day is login, first event of the following day is logoff - need to constrain
+// No logoff: last event of the day is login, first event of the following day is login
+// No login: first event of the day is logoff, last event of the previous day is logoff
 
 function createInterval(beginningEvent, endingEvent, running = false) {
   return new Interval(beginningEvent.instant, endingEvent.instant, running)
@@ -170,14 +170,14 @@ function createIntervals(events, day) {
         debug('Last event of the day was a login=', currentEvent)
         intervals.push('Last event of the day was a login at ' + toTimeString(currentEvent.instant))
       }
-    } else if (currentEvent.name === 'login' && nextEvent.name === 'logout') {
+    } else if (currentEvent.name === 'login' && (nextEvent.name === 'logout' || nextEvent.name === 'logoff')) {
       const interval = createInterval(currentEvent, nextEvent)
       debug('interval=', interval)
       intervals.push(interval)
       index++
-    } else if (state === START && currentEvent.name === 'logout') {
-      debug('First event of the day was a logout=', currentEvent)
-      intervals.push('First event of the day was a logout at ' + toTimeString(currentEvent.instant))
+    } else if (state === START && (currentEvent.name === 'logout' || currentEvent.name === 'logoff')) {
+      debug('First event of the day was a logoff=', currentEvent)
+      intervals.push('First event of the day was a logoff at ' + toTimeString(currentEvent.instant))
     } else {
       debug('skipping event=', currentEvent)
     }

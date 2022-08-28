@@ -55,7 +55,7 @@ tap.test('remove intervals of the same event next to each other', t => {
       },
       {
         instant: new Date('2022-01-27T18:00:00.000Z'),
-        name: 'logout',
+        name: 'logoff',
       },
       {
         instant: new Date('2022-01-27T19:00:00.000Z'),
@@ -63,7 +63,7 @@ tap.test('remove intervals of the same event next to each other', t => {
       },
       {
         instant: new Date('2022-01-28T00:00:00.000Z'),
-        name: 'logout',
+        name: 'logoff',
       },
     ],
   }
@@ -162,7 +162,7 @@ tap.test('bug 1', t => {
     new Summary(
       '2022-04-28',
       [
-        'First event of the day was a logout at 08:35',
+        'First event of the day was a logoff at 08:35',
         new Interval(new Date('2022-04-28T13:40:00.000Z'), new Date('2022-04-28T15:10:00.000Z')),
         new Interval(new Date('2022-04-28T15:50:00.000Z'), new Date('2022-04-28T16:04:00.000Z')),
       ],
@@ -171,7 +171,7 @@ tap.test('bug 1', t => {
   ]
 
   const expectedAsString =
-    ' - First event of the day was a logout at 08:35\n - 08:40 to 10:10    1 hour,  30 minutes\n - 10:50 to 11:04             14 minutes\n2022-04-28 total is  1 hour,  44 minutes'
+    ' - First event of the day was a logoff at 08:35\n - 08:40 to 10:10    1 hour,  30 minutes\n - 10:50 to 11:04             14 minutes\n2022-04-28 total is  1 hour,  44 minutes'
 
   debug('expected=', expected)
 
