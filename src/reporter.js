@@ -26,7 +26,7 @@ class Reporter {
 
   toString() {
     return this.summaries
-      .map(summary => {
+      .map((summary, index, array) => {
         let colorFunction
         if (!this.outputColor) {
           colorFunction = input => input
@@ -46,7 +46,10 @@ class Reporter {
         }
         const lastInterval = summary.intervals[summary.intervals.length - 1]
         debug('last interval=', lastInterval)
-        const running = typeof lastInterval === 'string' || lastInterval?.running
+        debug('index=', index)
+        debug('array.length=', array.length)
+        const running = (typeof lastInterval === 'string' || lastInterval?.running) && index === array.length - 1
+        debug('running=', running)
         const andCounting = running ? ' and counting' : ''
         // const runningMinutes = running ? lastInterval.duration.minutes : 0
         return intervalsString + colorFunction(`${summary.period} total is ${this.humanize(summary.total)}${andCounting}`)

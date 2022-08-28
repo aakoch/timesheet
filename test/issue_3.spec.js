@@ -6,7 +6,7 @@ import Reporter from "../src/reporter.js";
 
 const debug = debugFunc('timesheet/test')
 
-tap.test('should calculate correct hours', t => {
+tap.test('Should display summary for 2 days', t => {
 
   global.clock = { now: () => new Date('2022-08-11T13:10-05:00') }
 
@@ -29,6 +29,7 @@ tap.test('should calculate correct hours', t => {
   let report = new Reporter(actual, options).toString();
   debug("report=", report)
   t.same(actual[1].total, 240)
+  t.same(report.split('\n')[0], '2022-08-10 total is  3 hours, 49 minutes', 'Should not include \'and counting\'') // <-- Issue 8
   t.same(report.split('\n')[1], '2022-08-11 total is  4 hours,  0 minutes and counting')
   t.end()
 })
