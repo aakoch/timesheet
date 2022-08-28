@@ -11,9 +11,19 @@ import path from 'path'
 import os from 'os'
 import dayjs from 'dayjs'
 import chalk from 'chalk'
+// import { debug } from 'console'
 const test = !!import.meta.url.endsWith('?test')
+// import localizedFormat from 'dayjs/plugin/localizedFormat.js'
 // import debugFunc from 'debug'
 // const debug = debugFunc('@foo-dog/utils:common')
+
+// dayjs.extend(localizedFormat)
+
+let clock = {
+  now: () => {
+    return global.clock ? global.clock.now() :  new Date()
+  }
+}
 
 function createDateString(offsetHours = 0, offsetMinutes = 0, date = new Date()) {
   if (typeof offsetHours === 'object' && offsetMinutes === 0) {
@@ -54,6 +64,19 @@ function getOptions(args) {
         options.offset_minutes = parseInt(arg.slice(0, -1))
       } catch (ignore) {
         console.log('Could not parse "' + arg + '". Did you mean "[number of minutes]m"?')
+        process.exit()
+      }
+    } else if (arg.includes(':')) {
+      try {
+        // options.time is not implemented. Instead I just am calculating the difference and using
+        // the established offset_* fields
+        const timeParts = arg.split(':')
+        options.time = dayjs(clock.now()).hour(timeParts[0]).minute(timeParts[1]).startOf('minute')
+        options.offset_hours = dayjs(clock.now()).hour() - options.time.hour()
+        options.offset_minutes = dayjs(clock.now()).minute() - options.time.minute()
+      } catch (ignore) {
+        console.log('Could not parse "' + arg + '". Did you mean "hh:mm"?')
+        console.error('Error', ignore)
         process.exit()
       }
     } else {
