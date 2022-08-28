@@ -17,7 +17,7 @@ source src/.aliases
 
 login
 
-logout
+logoff
 
 timesheet
 ```

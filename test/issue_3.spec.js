@@ -12,13 +12,13 @@ tap.test('Should display summary for 2 days', t => {
 
   const testEntries = `
 2022-08-10T13:08-05:00 login
-2022-08-10T14:30-05:00 logout
-2022-08-10T16:57-05:00 logout
+2022-08-10T14:30-05:00 logoff
+2022-08-10T16:57-05:00 logoff
 2022-08-10T17:21-05:00 login
 2022-08-11T07:23-05:00 login
-2022-08-11T07:32-05:00 logout
+2022-08-11T07:32-05:00 logoff
 2022-08-11T07:47-05:00 login
-2022-08-11T10:56-05:00 logout
+2022-08-11T10:56-05:00 logoff
 2022-08-11T12:28-05:00 login
 2022-08-11T12:30-05:00 login
 `
