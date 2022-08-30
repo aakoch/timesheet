@@ -29,3 +29,5 @@ Please make sure to update tests as appropriate.
 
 ## License
 [GNU General Public License v3.0 or later](https://www.gnu.org/licenses/gpl-3.0.html)
+
+I can't get the commit signing to work.
