@@ -39,3 +39,16 @@ tap.test('getOptions', t => {
 
   t.end()
 })
+
+tap.test('should support passing in a time instead of hours/minutes offset', t => {
+ 
+  global.clock = { now: () => new Date('2022-08-11T09:10-05:00') }
+
+  const input = ['10:13']
+  const expected = { offset_hours: -1, offset_minutes: -3 }
+  const actual = getOptions(input)
+  delete actual.time
+  t.same(actual, expected)
+
+  t.end()
+})
