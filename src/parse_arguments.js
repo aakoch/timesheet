@@ -10,6 +10,8 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+import readVersion from './read_version.js'
+
 export default function parseArguments(args) {
   const options = { debug: false, outputIntervals: false, outputColor: true }
 
@@ -24,6 +26,9 @@ export default function parseArguments(args) {
     } else if (arg === '--printIntervals') {
       options.outputIntervals = true
       return false
+    } else if (arg === '--version' || arg === '-v') {
+      console.log('timesheet v' + readVersion())
+      process.exit()
     } else if (arg === '--debug') {
       options.debug = true
       return false
