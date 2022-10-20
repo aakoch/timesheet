@@ -14,10 +14,12 @@ import debugFunc from 'debug'
 const debug = debugFunc('timesheet/Reporter')
 
 class Reporter {
-  constructor(summaries, options = { outputIntervals: true, outputColor: true }) {
+  constructor(summaries, options) {
+    const opts = Object.assign({ outputIntervals: false, outputColor: false, reportDays: 14 }, options)
     this.summaries = summaries
-    this.printIntervals = options.outputIntervals
-    this.outputColor = options.outputColor
+    this.printIntervals = opts.outputIntervals
+    this.outputColor = opts.outputColor
+    this.reportDays = opts.reportDays
   }
 
   humanize(minutes) {
@@ -26,6 +28,7 @@ class Reporter {
 
   toString() {
     return this.summaries
+      .slice(-this.reportDays)
       .map((summary, index, array) => {
         let colorFunction
         if (!this.outputColor) {
