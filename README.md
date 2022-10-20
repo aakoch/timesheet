@@ -1,6 +1,6 @@
 # Timesheet
 
-Timesheet is a....
+Timesheet helps me keep track of time by recording the times I log in and log out of work.
 
 ## Installation
 
@@ -12,20 +12,46 @@ npm install @aakoch/timesheet
 
 ## Usage
 
+Add to your .zshrc:
 ```shell
 source src/.aliases
+```
 
-login
+Log in:
+```
+li
+```
 
-logoff
+Log out:
+```
+lo
+```
 
+Report times:
+```
 timesheet
+```
+
+### Options
+```
+li or lo:
+xm - timestamp x minutes earlier
+xh - timestamp x hours earlier
+These can be used together.
+Example: li 1h 30m - log in 1 hour and 30 minutes earlier
+
+timesheet:
+--printIntervals - Print the intervals between logging in and logging out used to determine totals
+Example: timesheet --printIntervals
 ```
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
+
+## Code of Conduct
+Please read the [code of conduct](CODE_OF_CONDUCT.md) before contributing.
 
 ## License
 [GNU General Public License v3.0 or later](https://www.gnu.org/licenses/gpl-3.0.html)
