@@ -6,7 +6,8 @@
   "scripts": {
     "test": "c8 tap --no-coverage",
     "debug": "tap --no-timeout",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "postinstall": "node src/postinstall.js"
   },
   "repository": {
     "type": "git",
