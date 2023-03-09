@@ -17,9 +17,13 @@
 import dayjs from 'dayjs'
 import dayjsUtc from 'dayjs/plugin/utc.js'
 import dayjsTimezone from 'dayjs/plugin/timezone.js'
+import weekOfYear from 'dayjs/plugin/weekOfYear.js'
+import advancedFormat from 'dayjs/plugin/advancedFormat.js'
 
 dayjs.extend(dayjsUtc)
 dayjs.extend(dayjsTimezone)
+dayjs.extend(weekOfYear)
+dayjs.extend(advancedFormat)
 
 let clock = {
   now: () => {
@@ -64,6 +68,16 @@ class Interval {
   toString() {
     const toTime = !!this.endInstant ? toTimeString(this.endInstant) : 'now  '
     return toTimeString(this.startInstant) + ' to ' + toTime + '   ' + this.duration.toString()
+  }
+}
+
+class DayInterval {
+  constructor(startDay, duration) {
+    this.startDay = startDay
+    this.duration = new Duration(duration);
+  }
+  toString() {
+    return this.startDay + " is   " + this.duration;
   }
 }
 
@@ -130,10 +144,14 @@ function removeRepeats(groupedByDates) {
 }
 
 function groupByDates(events) {
+  return groupByGiven(events, 'YYYY-MM-DD')
+}
+
+function groupByGiven(events, format) {
   return events.reduce((previousVal, currentVal) => {
     let dates = Object.assign({}, previousVal)
     const obj = currentVal
-    const dateString = dayjs(currentVal.instant).format('YYYY-MM-DD')
+    const dateString = dayjs(currentVal.instant).format(format)
     if (previousVal.hasOwnProperty(dateString)) {
       dates[dateString] = previousVal[dateString].concat(obj)
     } else {
@@ -202,20 +220,55 @@ function timesheet(input, options) {
   debug('typeof events=', typeof events)
   debug('options=', options)
 
-  const groupedByDates = groupByDates(events)
+  const grouped = groupByDates(events)
 
-  debug('groupedByDates=', groupedByDates)
+  debug('grouped=', grouped)
 
-  const uniqueGroupedByDates = removeRepeats(groupedByDates)
+  const uniqueGroupedByDates = removeRepeats(grouped)
 
   debug('uniqueGroupedByDates=' + uniqueGroupedByDates)
 
   // const summary = createSummary()
-  return Object.entries(uniqueGroupedByDates).map(([key, singleDayEvents]) => {
+  const dailySummaries = Object.entries(uniqueGroupedByDates).map(([key, singleDayEvents]) => {
     const intervals = createIntervals(singleDayEvents, key)
     const total = calculateTotal(intervals)
     return new Summary(key, intervals, total)
-  })
+  });
+
+  if (!!options.outputWeekly) {
+    function toWeek(period) {
+      return dayjs(period).format('YYYY-[W]ww')
+    };
+
+    let reduced = dailySummaries.reduce((previousVal, currentVal, currentIndex, summary) => {
+      let currentWeek = toWeek(currentVal.period)
+
+      if (previousVal.length > 0) {
+        let lastSummary = previousVal.pop();
+        let prevWeek = lastSummary.period;
+        if (prevWeek == currentWeek) {
+          lastSummary.intervals.push(new DayInterval(currentVal.period, currentVal.total));
+          lastSummary.total += currentVal.total;
+          previousVal.push(lastSummary);
+        }
+        else {
+          let newInterval = new DayInterval(currentVal.period, currentVal.total);
+          previousVal.push(lastSummary)
+          previousVal.push(new Summary(currentWeek, [newInterval], currentVal.total));
+        }
+        return previousVal
+      }
+      else {
+        let newInterval = new DayInterval(currentVal.period, currentVal.total)
+        return [new Summary(currentWeek, [newInterval], currentVal.total)];
+      }
+    }, []);
+
+    return reduced;
+  }
+  else {
+    return dailySummaries;
+  }
 }
 
-export { timesheet, groupByDates, toDateString, toTimeString, removeRepeats, Interval, Event, convertToEvents, Duration, Summary }
+export { timesheet, groupByDates, toDateString, toTimeString, removeRepeats, Interval, Event, createIntervals, convertToEvents, Duration, Summary }

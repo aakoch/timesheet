@@ -40,6 +40,7 @@ class Reporter {
         }
         let intervalsString = ''
         if (this.printIntervals) {
+          debug('summary.intervals=', summary.intervals);
           intervalsString =
             summary.intervals
               .map(interval => {

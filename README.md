@@ -43,6 +43,8 @@ Example: li 1h 30m - log in 1 hour and 30 minutes earlier
 timesheet:
 --printIntervals - Print the intervals between logging in and logging out used to determine totals
 Example: timesheet --printIntervals
+--printWeekly    - Print weekly summaries
+Example: timesheet --printWeekly
 ```
 
 ## Contributing
