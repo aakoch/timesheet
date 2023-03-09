@@ -26,6 +26,9 @@ export default function parseArguments(args) {
     } else if (arg === '--printIntervals') {
       options.outputIntervals = true
       return false
+    } else if (arg === '--printWeekly') {
+      options.outputWeekly = true
+      return false
     } else if (arg === '--version' || arg === '-v') {
       console.log('timesheet v' + readVersion())
       process.exit()
