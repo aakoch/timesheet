@@ -17,7 +17,7 @@ const debug = debugFunc('timesheet/Reporter')
 class Reporter {
   public printIntervals: boolean;
   public outputColor: boolean;
-  public reportDays: boolean;
+  public reportDays: boolean | number;
 
   constructor(public summaries: Summary[], options: Options) {
     const opts: Options = Object.assign({ outputIntervals: false, outputColor: false, reportDays: 14 }, options)
