@@ -10,16 +10,17 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import readVersion from './read_version.js'
+import { Options } from "./Options"
+import readVersion from './read_version.ts'
 
-export default function parseArguments(args) {
-  const options = { debug: false, outputIntervals: false, outputColor: true }
+export default function parseArguments(args: string[]) {
+  const options: Options = { debug: false, outputIntervals: false, outputColor: true }
 
-  const debug = process.argv.slice(2).includes('--debug') ? (...objs) => console.log(...objs) : () => {}
+  const debug: Function = process.argv.slice(2).includes('--debug') ? (...objs: any) => console.log(...objs) : () => {}
 
   debug('args=', args)
 
-  const leftoverArgs = args.filter(arg => {
+  const leftoverArgs = args.filter((arg: any) => {
     if (arg === '--help' || arg === '-h') {
       console.log('Display hours worked per day. Options include\n  --debug\n  --printIntervals\n  --no-color')
       process.exit()

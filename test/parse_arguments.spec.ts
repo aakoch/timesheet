@@ -8,18 +8,23 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import parseArguments from './parse_arguments.js'
-import { timesheet } from './timesheet.js'
-import fs from 'fs'
-import path from 'path'
-import os from 'os'
-import Reporter from './reporter.js'
+import tap from 'tap'
+import parseArguments from '../src/parse_arguments.js'
 
-const options = parseArguments(process.argv.slice(2))
-const debug = process.argv.includes('--debug') ? (...objs) => console.log(...objs) : () => {}
-debug('options=', options)
+tap.test('node', t => {
+  const input: any = []
+  const expected = { debug: false, outputIntervals: false, outputColor: true }
 
-// TODO: make filename customizable
-const input = fs.readFileSync(path.resolve(os.homedir() + '/timesheet.txt')).toString()
-// debug('input=', input)
-console.log(new Reporter(timesheet(input, options), options).toString())
+  t.same(parseArguments(input), expected)
+
+  t.end()
+})
+
+tap.test('debug and printIntervals', t => {
+  const input = ['--debug', '--printIntervals', '--badArgument']
+  const expected = { debug: true, outputIntervals: true, outputColor: true }
+
+  t.same(parseArguments(input), expected)
+
+  t.end()
+})

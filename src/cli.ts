@@ -8,6 +8,18 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { appendTimestamp, getOptions } from './common.js'
+import parseArguments from './parse_arguments'
+import { timesheet } from './timesheet'
+import fs from 'fs'
+import path from 'path'
+import os from 'os'
+import Reporter from './reporter'
 
-appendTimestamp('login', getOptions(process.argv.slice(2)))
+const options = parseArguments(process.argv.slice(2))
+const debug = process.argv.includes('--debug') ? (...objs: any) => console.log(...objs) : () => {}
+debug('options=', options)
+
+// TODO: make filename customizable
+const input = fs.readFileSync(path.resolve(os.homedir() + '/timesheet.txt')).toString()
+// debug('input=', input)
+console.log(new Reporter(timesheet(input, options), options).toString())

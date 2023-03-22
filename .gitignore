@@ -4,3 +4,5 @@ secrets
 .vscode
 coverage
 .DS_Store
+dist
+.parcel-cache

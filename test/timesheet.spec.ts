@@ -16,7 +16,7 @@ import { simpleProjectRootDir } from '@foo-dog/utils'
 import { timesheet, removeRepeats, groupByDates, Interval, Event, convertToEvents, Summary, createIntervals } from '../src/timesheet.js'
 import Reporter from '../src/reporter.js'
 import parseArguments from '../src/parse_arguments.js'
-import { createDateString } from '../src/common.js'
+import { Options, createDateString } from '../src/common.ts'
 import debugFunc from 'debug'
 const debug = debugFunc('timesheet/test')
 
@@ -111,7 +111,7 @@ tap.test('no intervals printed', t => {
 })
 
 tap.test('running total', t => {
-  const actual = timesheet(createDateString(new Date()) + ' login', options)
+  const actual = timesheet(createDateString(0, 0, new Date()) + ' login', options)
 
   debug('actual=', actual)
 
@@ -141,7 +141,7 @@ tap.test('only minutes', t => {
 tap.test('intervals printed', t => {
   const input = fs.readFileSync(path.resolve(filename)).toString()
 
-  const options = {}
+  const options: Options = {}
 
   const actual = timesheet(input, options)
 
@@ -161,7 +161,7 @@ tap.test('intervals printed', t => {
 tap.test('bug 1', t => {
   const input = fs.readFileSync(path.resolve(simpleProjectRootDir() + '/test/bug1.txt')).toString()
 
-  const options = {}
+  const options: Options = {}
 
   const actual = timesheet(input, options)
 
@@ -261,7 +261,7 @@ tap.test('weekly summary printed', t => {
 
   debug('actual=', inspect(actual, false, 10))
 
-  const expected = `2023-06 total is 43 hours, 58 minutes
+  const expected = `2023-W06 total is 43 hours, 58 minutes
 2023-W07 total is 41 hours, 58 minutes
 2023-W08 total is 41 hours,  8 minutes
 2023-W09 total is 45 hours, 43 minutes

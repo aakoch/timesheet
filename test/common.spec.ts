@@ -9,13 +9,13 @@
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import tap from 'tap'
-import { createDateString, appendTimestamp, getOptions } from '../src/common.js?test'
+import { createDateString, appendTimestamp, getOptions } from '../src/common.ts'
 
 tap.test('createDateString with no offset', t => {
   const expected = '2022-01-22T22:22-06:00' // works only in CST
   // const expected = '2022-01-22T22:22+00:00' // works only in UTC - see package.json on how to tell NodeJS to use UTC
   const date = new Date(2022, 0, 22, 22, 22, 0)
-  t.same(createDateString(date), expected)
+  t.same(createDateString(0, 0, date), expected)
 
   t.end()
 })
@@ -42,7 +42,7 @@ tap.test('getOptions', t => {
 
 tap.test('should support passing in a time instead of hours/minutes offset', t => {
  
-  global.clock = { now: () => new Date('2022-08-11T09:10-05:00') }
+  (global as any).clock = { now: () => new Date('2022-08-11T09:10-05:00') }
 
   const input = ['10:13']
   const expected = { offset_hours: -1, offset_minutes: -3 }
