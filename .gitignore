@@ -4,3 +4,4 @@ secrets
 .vscode
 coverage
 .DS_Store
+dist
