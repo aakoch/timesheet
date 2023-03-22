@@ -40,7 +40,7 @@ const debug = process.argv.includes('--debug') ? (...objs: any) => console.log(.
 
 // should I use https://day.js.org/docs/en/plugin/duration ?
 class Duration {
-  constructor(private minutes: number) {
+  constructor(public minutes: number) {
   }
   toString() {
     const strArr = []
@@ -59,17 +59,17 @@ class Duration {
   }
 }
 
-class Interval {
+abstract class AbstractInterval {
+  constructor(public duration: Duration, public running = false) {}
+}
 
-  public duration: any;
-
-  constructor(private startInstant: Date, private endInstant: Date, private running = false) {
+class Interval extends AbstractInterval {
+  constructor(private startInstant: Date, private endInstant: Date, running = false) {
+    super(new Duration(Interval.timeBetween(startInstant, endInstant)), running);
     this.startInstant = startInstant
     this.endInstant = endInstant
-    this.duration = new Duration(this.timeBetween(startInstant, endInstant))
-    this.running = running
   }
-  timeBetween(startInstant: Date, endInstant: Date) {
+  static timeBetween(startInstant: Date, endInstant: Date) {
     return (endInstant.getTime() - startInstant.getTime()) / 60000
   }
   toString() {
@@ -78,10 +78,9 @@ class Interval {
   }
 }
 
-class DayInterval {
-  private duration: Duration;
-  constructor(private startDay: any, duration: number) {
-    this.duration = new Duration(duration);
+class DayInterval extends AbstractInterval {
+  constructor(private startDay: string, duration: number) {
+    super(new Duration(duration));
   }
   toString() {
     return this.startDay + " is   " + this.duration;
@@ -89,7 +88,7 @@ class DayInterval {
 }
 
 class Event {
-  constructor(public instant: Date, public name: any) {
+  constructor(public instant: Date, public name: string) {
   }
 
   static parse(line: string) {
@@ -102,7 +101,7 @@ class Event {
 }
 
 class Summary {
-  constructor(public period: string, private intervals: (string | Interval)[] | DayInterval[], private total: number) {
+  constructor(public period: string, public intervals: (string | Interval | DayInterval)[], public total: number | { minutes: number }) {
   }
 }
 
@@ -242,26 +241,26 @@ function timesheet(input: string, options: Options) {
       return dayjs(period).format('YYYY-[W]ww')
     };
 
-    let reduced = dailySummaries.reduce((previousVal: any, currentVal: any, currentIndex, summary) => {
+    let reduced = dailySummaries.reduce((previousVal: Summary[], currentVal: Summary) => {
       let currentWeek = toWeek(currentVal.period)
 
       if (previousVal.length > 0) {
-        let lastSummary = previousVal.pop();
+        let lastSummary: Summary = previousVal.pop()!;
         let prevWeek = lastSummary.period;
         if (prevWeek == currentWeek) {
-          lastSummary.intervals.push(new DayInterval(currentVal.period, currentVal.total));
-          lastSummary.total += currentVal.total;
+          lastSummary.intervals.push(new DayInterval(currentVal.period, currentVal.total as number));
+          lastSummary.total = (lastSummary.total as number) + (currentVal.total as number);
           previousVal.push(lastSummary);
         }
         else {
-          let newInterval = new DayInterval(currentVal.period, currentVal.total);
+          let newInterval = new DayInterval(currentVal.period, currentVal.total as number);
           previousVal.push(lastSummary)
           previousVal.push(new Summary(currentWeek, [newInterval], currentVal.total));
         }
         return previousVal
       }
       else {
-        let newInterval = new DayInterval(currentVal.period, currentVal.total)
+        let newInterval = new DayInterval(currentVal.period, currentVal.total as number)
         return [new Summary(currentWeek, [newInterval], currentVal.total)];
       }
     }, []);
@@ -273,4 +272,4 @@ function timesheet(input: string, options: Options) {
   }
 }
 
-export { timesheet, groupByDates, toDateString, toTimeString, removeRepeats, Interval, Event, createIntervals, convertToEvents, Duration, Summary }
+export { timesheet, groupByDates, toDateString, toTimeString, removeRepeats, Interval, Event, createIntervals, convertToEvents, Duration, Summary, DayInterval }

@@ -8,9 +8,10 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { Duration } from './timesheet.ts'
+import { Duration, Summary, DayInterval, Interval } from './timesheet.ts'
 import chalk from 'chalk'
 import debugFunc from 'debug'
+import { Options } from './Options';
 const debug = debugFunc('timesheet/Reporter')
 
 class Reporter {
@@ -18,12 +19,12 @@ class Reporter {
   public outputColor: boolean;
   public reportDays: boolean;
 
-  constructor(public summaries: any, options: any) {
-    const opts = Object.assign({ outputIntervals: false, outputColor: false, reportDays: 14 }, options)
+  constructor(public summaries: Summary[], options: Options) {
+    const opts: Options = Object.assign({ outputIntervals: false, outputColor: false, reportDays: 14 }, options)
     this.summaries = summaries
-    this.printIntervals = opts.outputIntervals
-    this.outputColor = opts.outputColor
-    this.reportDays = opts.reportDays
+    this.printIntervals = opts.outputIntervals ?? false
+    this.outputColor = opts.outputColor ?? false
+    this.reportDays = opts.reportDays ?? false
   }
 
   humanize(minutes: number) {
@@ -33,16 +34,16 @@ class Reporter {
   toString() {
     return this.summaries
       .slice(-this.reportDays)
-      .map((summary: any, index: any, array: any) => {
+      .map((summary: Summary, index: number, array: Summary[]) => {
         let colorFunction
         if (!this.outputColor) {
           colorFunction = (input: any) => input
-        } else if (summary.total.minutes > 24 * 60) {
+        } else if ((summary.total as {minutes:number}).minutes > 24 * 60) {
           colorFunction = chalk.red
         } else {
           colorFunction = chalk.blue
         }
-        let intervalsString = ''
+        let intervalsString: string = ''
         if (this.printIntervals) {
           debug('summary.intervals=', summary.intervals);
           intervalsString =
@@ -60,7 +61,7 @@ class Reporter {
         debug('running=', running)
         const andCounting = running ? ' and counting' : ''
         // const runningMinutes = running ? lastInterval.duration.minutes : 0
-        return intervalsString + colorFunction(`${summary.period} total is ${this.humanize(summary.total)}${andCounting}`)
+        return intervalsString + colorFunction(`${summary.period} total is ${this.humanize(summary.total as number)}${andCounting}`)
       })
       .join('\n')
   }

@@ -9,4 +9,5 @@ export type Options = {
   outputColor?: boolean;
   outputWeekly?: boolean; 
   printIntervals?: boolean;
+  reportDays?: boolean;
 };
