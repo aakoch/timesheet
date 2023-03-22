@@ -8,12 +8,12 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import parseArguments from './parse_arguments.ts'
-import { timesheet } from './timesheet.ts'
+import parseArguments from './parse_arguments'
+import { timesheet } from './timesheet'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import Reporter from './reporter.ts'
+import Reporter from './reporter'
 
 const options = parseArguments(process.argv.slice(2))
 const debug = process.argv.includes('--debug') ? (...objs: any) => console.log(...objs) : () => {}
