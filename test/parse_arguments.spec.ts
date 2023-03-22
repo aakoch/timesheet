@@ -12,7 +12,7 @@ import tap from 'tap'
 import parseArguments from '../src/parse_arguments.js'
 
 tap.test('node', t => {
-  const input = []
+  const input: any = []
   const expected = { debug: false, outputIntervals: false, outputColor: true }
 
   t.same(parseArguments(input), expected)

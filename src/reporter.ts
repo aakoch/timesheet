@@ -14,7 +14,11 @@ import debugFunc from 'debug'
 const debug = debugFunc('timesheet/Reporter')
 
 class Reporter {
-  constructor(summaries, options) {
+  public printIntervals: boolean;
+  public outputColor: boolean;
+  public reportDays: boolean;
+
+  constructor(public summaries: any, options: any) {
     const opts = Object.assign({ outputIntervals: false, outputColor: false, reportDays: 14 }, options)
     this.summaries = summaries
     this.printIntervals = opts.outputIntervals
@@ -22,17 +26,17 @@ class Reporter {
     this.reportDays = opts.reportDays
   }
 
-  humanize(minutes) {
+  humanize(minutes: number) {
     return new Duration(minutes).toString()
   }
 
   toString() {
     return this.summaries
       .slice(-this.reportDays)
-      .map((summary, index, array) => {
+      .map((summary: any, index: any, array: any) => {
         let colorFunction
         if (!this.outputColor) {
-          colorFunction = input => input
+          colorFunction = (input: any) => input
         } else if (summary.total.minutes > 24 * 60) {
           colorFunction = chalk.red
         } else {
@@ -43,7 +47,7 @@ class Reporter {
           debug('summary.intervals=', summary.intervals);
           intervalsString =
             summary.intervals
-              .map(interval => {
+              .map((interval: any) => {
                 return ` - ${interval}`
               })
               .join('\n') + '\n'

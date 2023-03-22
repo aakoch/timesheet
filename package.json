@@ -4,8 +4,8 @@
   "description": "Track log in and log out events and display them in a way to make it easy to submit a timesheet",
   "main": "timesheet.js",
   "scripts": {
-    "test": "c8 tap --no-coverage",
-    "debug": "tap --no-timeout",
+    "test": "c8 tap",
+    "debug": "c8 tap --no-timeout",
     "postversion": "git push && git push --tags",
     "postinstall": "node src/postinstall.js"
   },
@@ -27,8 +27,13 @@
   "type": "module",
   "devDependencies": {
     "@foo-dog/utils": "^0.3.0",
+    "@types/node": "^18.15.5",
+    "@types/tap": "^15.0.8",
     "c8": "^7.12.0",
-    "tap": "^16.3.0"
+    "tap": "^16.3.4",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.2"
   },
   "dependencies": {
     "chalk": "^5.0.1",
@@ -36,5 +41,14 @@
   },
   "directories": {
     "test": "test"
+  },
+  "tap": {
+    "coverage": false,
+    "node-arg": [
+      "--no-warnings",
+      "--loader",
+      "ts-node/esm"
+    ],
+    "ts": false
   }
 }

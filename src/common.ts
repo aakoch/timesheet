@@ -5,11 +5,10 @@
 // This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import dayjs from 'dayjs'
+import dayjs, { type Dayjs } from 'dayjs';
 import chalk from 'chalk'
 // import { debug } from 'console'
 const test = !!import.meta.url.endsWith('?test')
@@ -21,7 +20,7 @@ const test = !!import.meta.url.endsWith('?test')
 
 let clock = {
   now: () => {
-    return global.clock ? global.clock.now() :  new Date()
+    return (global as any).clock ? (global as any).clock.now() :  new Date()
   }
 }
 
@@ -38,17 +37,20 @@ function createDateString(offsetHours = 0, offsetMinutes = 0, date = new Date())
   return dayjs(dateToUse).format('YYYY-MM-DDTHH:mmZ')
 }
 
-function appendTimestamp(str, opt) {
+function appendTimestamp(str: string, opt: Options) {
   const options = Object.assign({ filename: os.homedir() + '/timesheet.txt', offset_hours: 0, offset_minutes: 0 }, opt)
   const dateStr = createDateString(options.offset_hours, options.offset_minutes)
   fs.appendFileSync(path.resolve(options.filename), dateStr + ` ${str}\n`)
   console.log(`${chalk.cyanBright('Success!')} ${chalk.bold(str)} event added to ${path.basename(options.filename)} at ${chalk.bold(dateStr)}`)
 }
 
-function getOptions(args) {
-  const options = { offset_hours: 0, offset_minutes: 0 }
+type Options = { offset_hours?: number, offset_minutes?: number, time?: Dayjs, debug?: boolean; outputIntervals?: boolean; outputColor?: boolean;
+  outputWeekly?: boolean; printIntervals?: boolean };
 
-  args.forEach(arg => {
+function getOptions(args: string[]): Options {
+  const options: Options = { offset_hours: 0, offset_minutes: 0 }
+
+  args.forEach((arg: string) => {
     if (arg === '--help' || arg === '-h') {
       console.log(`Write a timestamp to ~/timesheet.txt. \n  Usage: ${process.argv0} ${process.argv[1]} [offset in minutes]`)
       process.exit()
@@ -70,8 +72,8 @@ function getOptions(args) {
       try {
         // options.time is not implemented. Instead I just am calculating the difference and using
         // the established offset_* fields
-        const timeParts = arg.split(':')
-        options.time = dayjs(clock.now()).hour(timeParts[0]).minute(timeParts[1]).startOf('minute')
+        const timeParts: string[] = arg.split(':')
+        options.time = dayjs(clock.now()).hour(parseInt(timeParts[0], 10)).minute(parseInt(timeParts[1], 10)).startOf('minute')
         options.offset_hours = dayjs(clock.now()).hour() - options.time.hour()
         options.offset_minutes = dayjs(clock.now()).minute() - options.time.minute()
       } catch (ignore) {
@@ -91,4 +93,4 @@ function getOptions(args) {
   return options
 }
 
-export { createDateString, appendTimestamp, getOptions }
+export { createDateString, appendTimestamp, getOptions, Options }

@@ -1,14 +1,14 @@
 import tap from 'tap'
-// noinspection ES6PreferShortImport
-import {timesheet} from '../src/timesheet.js?test'
+import {timesheet} from '../src/timesheet.ts'
 import debugFunc from 'debug'
 import Reporter from "../src/reporter.js";
+import { Options } from '../src/common';
 
 const debug = debugFunc('timesheet/test')
 
 tap.test('Should display summary for 2 days', t => {
 
-  global.clock = { now: () => new Date('2022-08-11T13:10-05:00') }
+  (global as any).clock = { now: () => new Date('2022-08-11T13:10-05:00') }
 
   const testEntries = `
 2022-08-10T13:08-05:00 login
@@ -22,8 +22,8 @@ tap.test('Should display summary for 2 days', t => {
 2022-08-11T12:28-05:00 login
 2022-08-11T12:30-05:00 login
 `
-  const options = { printIntervals: true }
-  const actual = timesheet(testEntries, options)
+  const options: Options = { printIntervals: true }
+  const actual: any = timesheet(testEntries, options)
   debug("actual=", actual)
 
   let report = new Reporter(actual, options).toString();

@@ -17,4 +17,3 @@ readliner.question(`Would you like to add the 'li' and 'lo' aliases to your shel
 
     console.log("Thanks for installing!")
 });
-
