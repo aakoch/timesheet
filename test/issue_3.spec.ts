@@ -2,7 +2,7 @@ import tap from 'tap'
 import {timesheet} from '../src/timesheet.ts'
 import debugFunc from 'debug'
 import Reporter from "../src/reporter.js";
-import { Options } from '../src/common';
+import { Options } from "../src/Options";
 
 const debug = debugFunc('timesheet/test')
 

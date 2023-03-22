@@ -16,9 +16,8 @@ import { simpleProjectRootDir } from '@foo-dog/utils'
 import { timesheet, removeRepeats, groupByDates, Interval, Event, convertToEvents, Summary, createIntervals } from '../src/timesheet.js'
 import Reporter from '../src/reporter.js'
 import parseArguments from '../src/parse_arguments.js'
-import { createDateString } from '../src/common.ts'
+import { Options, createDateString } from '../src/common.ts'
 import debugFunc from 'debug'
-import { Options } from '../src/common.js'
 const debug = debugFunc('timesheet/test')
 
 const filename = simpleProjectRootDir() + '/test/example.txt'

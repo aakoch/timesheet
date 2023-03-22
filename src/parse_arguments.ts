@@ -10,13 +10,13 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { Options } from './common.js'
+import { Options } from "./Options"
 import readVersion from './read_version.js'
 
-export default function parseArguments(args: any) {
+export default function parseArguments(args: string[]) {
   const options: Options = { debug: false, outputIntervals: false, outputColor: true }
 
-  const debug = process.argv.slice(2).includes('--debug') ? (...objs: any) => console.log(...objs) : () => {}
+  const debug: Function = process.argv.slice(2).includes('--debug') ? (...objs: any) => console.log(...objs) : () => {}
 
   debug('args=', args)
 

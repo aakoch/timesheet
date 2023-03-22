@@ -19,7 +19,7 @@ import dayjsUtc from 'dayjs/plugin/utc.js'
 import dayjsTimezone from 'dayjs/plugin/timezone.js'
 import weekOfYear from 'dayjs/plugin/weekOfYear.js'
 import advancedFormat from 'dayjs/plugin/advancedFormat.js'
-import { Options } from './common'
+import { Options } from "./Options"
 
 dayjs.extend(dayjsUtc)
 dayjs.extend(dayjsTimezone)

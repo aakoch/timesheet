@@ -8,8 +8,9 @@
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import dayjs, { type Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import chalk from 'chalk'
+import { Options } from './Options';
 // import { debug } from 'console'
 const test = !!import.meta.url.endsWith('?test')
 // import localizedFormat from 'dayjs/plugin/localizedFormat.js'
@@ -43,9 +44,6 @@ function appendTimestamp(str: string, opt: Options) {
   fs.appendFileSync(path.resolve(options.filename), dateStr + ` ${str}\n`)
   console.log(`${chalk.cyanBright('Success!')} ${chalk.bold(str)} event added to ${path.basename(options.filename)} at ${chalk.bold(dateStr)}`)
 }
-
-type Options = { offset_hours?: number, offset_minutes?: number, time?: Dayjs, debug?: boolean; outputIntervals?: boolean; outputColor?: boolean;
-  outputWeekly?: boolean; printIntervals?: boolean };
 
 function getOptions(args: string[]): Options {
   const options: Options = { offset_hours: 0, offset_minutes: 0 }
