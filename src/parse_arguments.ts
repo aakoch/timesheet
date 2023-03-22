@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import { Options } from "./Options"
-import readVersion from './read_version.js'
+import readVersion from './read_version.ts'
 
 export default function parseArguments(args: string[]) {
   const options: Options = { debug: false, outputIntervals: false, outputColor: true }

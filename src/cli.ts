@@ -8,15 +8,15 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import parseArguments from './parse_arguments.js'
-import { timesheet } from './timesheet.js'
+import parseArguments from './parse_arguments.ts'
+import { timesheet } from './timesheet.ts'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import Reporter from './reporter.js'
+import Reporter from './reporter.ts'
 
 const options = parseArguments(process.argv.slice(2))
-const debug = process.argv.includes('--debug') ? (...objs) => console.log(...objs) : () => {}
+const debug = process.argv.includes('--debug') ? (...objs: any) => console.log(...objs) : () => {}
 debug('options=', options)
 
 // TODO: make filename customizable

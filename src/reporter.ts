@@ -8,7 +8,7 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { Duration } from './timesheet.js'
+import { Duration } from './timesheet.ts'
 import chalk from 'chalk'
 import debugFunc from 'debug'
 const debug = debugFunc('timesheet/Reporter')
