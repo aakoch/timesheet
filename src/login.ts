@@ -11,6 +11,7 @@
 import fs from 'fs'
 import os from 'os'
 import { resolve } from 'path'
+import readLastLines from 'read-last-lines'
 import { appendTimestamp, getOptions } from './common'
 import parseArguments from './parse_arguments'
 import Reporter from './reporter'
@@ -21,5 +22,9 @@ appendTimestamp('login', getOptions(process.argv.slice(2)))
 
 // TODO: make filename customizable
 const input = fs.readFileSync(resolve(os.homedir(), 'timesheet.txt')).toString()
-// debug('input=', input)
-console.log(new Reporter(timesheet(input, parseArguments([])), {reportDays: 1}).toString())
+readLastLines
+  .read(resolve(os.homedir(), 'timesheet.txt'), 50)
+  .then((text) => {
+    // debug('text=', text)
+    console.log(new Reporter(timesheet(input, parseArguments([])), {reportDays: 1}).toString())
+  });

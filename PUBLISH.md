@@ -1,5 +1,5 @@
 # How to Publish
 
-`npm version [major|minor|patch]`
+`npm version [major|minor|patch|etc]`
 
 `npm publish --access public`

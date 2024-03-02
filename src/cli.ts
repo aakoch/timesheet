@@ -8,18 +8,22 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import parseArguments from './parse_arguments'
-import { timesheet } from './timesheet'
-import fs from 'fs'
-import path, { resolve } from 'path'
 import os from 'os'
+import { resolve } from 'path'
+import readLastLines from 'read-last-lines'
+import parseArguments from './parse_arguments'
 import Reporter from './reporter'
+import { timesheet } from './timesheet'
 
 const options = parseArguments(process.argv.slice(2))
 const debug = process.argv.includes('--debug') ? (...objs: any) => console.log(...objs) : () => {}
 debug('options=', options)
 
 // TODO: make filename customizable
-const input = fs.readFileSync(resolve(os.homedir(), 'timesheet.txt')).toString()
-// debug('input=', input)
-console.log(new Reporter(timesheet(input, options), options).toString())
+// const input = fs.readFileSync(resolve(os.homedir(), 'timesheet.txt')).toString()
+readLastLines
+  .read(resolve(os.homedir(), 'timesheet.txt'), 50)
+  .then((text) => {
+    // debug('text=', text)
+    console.log(new Reporter(timesheet(text, options), options).toString())
+  });
