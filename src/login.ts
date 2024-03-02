@@ -8,18 +8,18 @@
 
 // You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { appendTimestamp, getOptions } from './common'
-import { timesheet } from './timesheet'
 import fs from 'fs'
-import path from 'path'
 import os from 'os'
-import Reporter from './reporter'
+import { resolve } from 'path'
+import { appendTimestamp, getOptions } from './common'
 import parseArguments from './parse_arguments'
+import Reporter from './reporter'
+import { timesheet } from './timesheet'
 
 appendTimestamp('login', getOptions(process.argv.slice(2)))
 
 
 // TODO: make filename customizable
-const input = fs.readFileSync(path.resolve(os.homedir() + '/timesheet.txt')).toString()
+const input = fs.readFileSync(resolve(os.homedir(), 'timesheet.txt')).toString()
 // debug('input=', input)
 console.log(new Reporter(timesheet(input, parseArguments([])), {reportDays: 1}).toString())

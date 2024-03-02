@@ -11,7 +11,7 @@
 import parseArguments from './parse_arguments'
 import { timesheet } from './timesheet'
 import fs from 'fs'
-import path from 'path'
+import path, { resolve } from 'path'
 import os from 'os'
 import Reporter from './reporter'
 
@@ -20,6 +20,6 @@ const debug = process.argv.includes('--debug') ? (...objs: any) => console.log(.
 debug('options=', options)
 
 // TODO: make filename customizable
-const input = fs.readFileSync(path.resolve(os.homedir() + '/timesheet.txt')).toString()
+const input = fs.readFileSync(resolve(os.homedir(), 'timesheet.txt')).toString()
 // debug('input=', input)
 console.log(new Reporter(timesheet(input, options), options).toString())

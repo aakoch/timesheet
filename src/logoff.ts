@@ -20,6 +20,6 @@ appendTimestamp('logoff', getOptions(process.argv.slice(2)))
 
 
 // TODO: make filename customizable
-const input = fs.readFileSync(path.resolve(os.homedir() + '/timesheet.txt')).toString()
+const input = fs.readFileSync(path.resolve(os.homedir(), 'timesheet.txt')).toString()
 // debug('input=', input)
 console.log(new Reporter(timesheet(input, parseArguments([])), {reportDays: 1}).toString())

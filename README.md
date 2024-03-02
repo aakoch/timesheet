@@ -52,6 +52,12 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
+## Packaging
+
+```shell
+npm version [major|minor|patch|etc]
+```
+
 ## Code of Conduct
 Please read the [code of conduct](CODE_OF_CONDUCT.md) before contributing.
 
