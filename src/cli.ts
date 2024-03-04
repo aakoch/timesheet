@@ -22,7 +22,7 @@ debug('options=', options)
 // TODO: make filename customizable
 // const input = fs.readFileSync(resolve(os.homedir(), 'timesheet.txt')).toString()
 readLastLines
-  .read(resolve(os.homedir(), 'timesheet.txt'), 50)
+  .read(resolve(os.homedir(), 'timesheet.txt'), 100)
   .then((text) => {
     // debug('text=', text)
     console.log(new Reporter(timesheet(text, options), options).toString())

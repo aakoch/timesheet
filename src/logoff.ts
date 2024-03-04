@@ -20,7 +20,7 @@ appendTimestamp('logoff', getOptions(process.argv.slice(2)))
 
 // TODO: make filename customizable
 readLastLines
-  .read(resolve(os.homedir(), 'timesheet.txt'), 50)
+  .read(resolve(os.homedir(), 'timesheet.txt'), 100)
   .then((text) => {
     // debug('text=', text)
     console.log(new Reporter(timesheet(text, parseArguments([])), {reportDays: 1}).toString())
