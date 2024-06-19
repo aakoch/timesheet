@@ -1,3 +1,4 @@
 alias li="~/projects/timesheet/dist/login.js"
 alias lo="~/projects/timesheet/dist/logoff.js"
+alias lb="~/projects/timesheet/dist/logbreak.js"
 alias timesheet="~/projects/timesheet/dist/cli.js"

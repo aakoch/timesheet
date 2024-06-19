@@ -5,7 +5,8 @@
   "source": [
     "src/cli.ts",
     "src/login.ts",
-    "src/logoff.ts"
+    "src/logoff.ts",
+    "src/logbreak.ts"
   ],
   "scripts": {
     "test": "c8 tap",
